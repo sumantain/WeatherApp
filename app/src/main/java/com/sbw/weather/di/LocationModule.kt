@@ -1,6 +1,6 @@
 package com.sbw.weather.di
 
-import com.sbw.weather.data.location.DefaultLocationTracker
+import com.sbw.weather.core.location.DefaultLocationTracker
 import com.sbw.weather.domain.location.LocationTracker
 import dagger.Binds
 import dagger.Module

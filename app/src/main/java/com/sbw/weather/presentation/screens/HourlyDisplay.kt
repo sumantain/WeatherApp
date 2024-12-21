@@ -11,9 +11,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.sbw.weather.R
 import com.sbw.weather.domain.weather.WeatherData
+import com.sbw.weather.presentation.viewmodel.WeatherViewModel
 import java.time.format.DateTimeFormatter
 
 @Composable
@@ -22,10 +26,9 @@ fun HourlyDisplay(
     modifier: Modifier = Modifier,
     textColor: Color = Color.Red
 ) {
+    val viewModel: WeatherViewModel = viewModel()
     val formattedTime = remember(weatherData) {
-        weatherData.time.format(
-            DateTimeFormatter.ofPattern("HH:mm")
-        )
+        viewModel.formatTime(weatherData.time)
     }
     Column(
         modifier = modifier,
@@ -42,7 +45,7 @@ fun HourlyDisplay(
             modifier = Modifier.width(40.dp)
         )
         Text(
-            text = "${weatherData.temperatureCelsius}°C",
+            text = stringResource(R.string.c, weatherData.temperatureCelsius),
             color = textColor,
             fontWeight = FontWeight.Bold
         )

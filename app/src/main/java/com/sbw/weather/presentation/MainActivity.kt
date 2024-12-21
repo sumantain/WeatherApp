@@ -2,6 +2,7 @@ package com.sbw.weather.presentation
 
 import android.Manifest
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
@@ -16,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.sbw.weather.R
 import com.sbw.weather.presentation.screens.WeatherCard
 import com.sbw.weather.presentation.screens.WeatherForecast
 import com.sbw.weather.presentation.ui.theme.WeatherTheme
@@ -33,16 +35,30 @@ class MainActivity : ComponentActivity() {
 
         permissionLauncher= registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions()
-        ){
-            viewModel.loadWeatherInfo()
+        ){ permission ->
+            if (permission[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+                permission[Manifest.permission.ACCESS_COARSE_LOCATION] == true) {
+                viewModel.loadWeatherInfo()
+            } else {
+                // Check if rationale should be shown
+                if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION) ||
+                    shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_COARSE_LOCATION)) {
+                    initiatesPermissionRequest()
+
+                } else {
+                    // User has denied permissions and selected "Don't ask again"
+                    // Handle this case gracefully (e.g., disable location-based features)
+                    Toast.makeText(this,
+                        getString(R.string.location_permission_is_permanently_denied_you_can_enable_it_in_the_app_settings), Toast.LENGTH_LONG).show()
+                }
+            }
         }
-        permissionLauncher.launch(arrayOf(
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        ))
+
+        //This method initiates the permission request
+        initiatesPermissionRequest()
 
         setContent {
-            viewModel.state.let {
+            viewModel.state.let { loadState ->
                 WeatherTheme {
                     Box(
                         modifier = Modifier.fillMaxSize()
@@ -53,23 +69,22 @@ class MainActivity : ComponentActivity() {
                                 .background(Color.LightGray)
                         ) {
                             WeatherCard(
-                                state = it,
-                                backgroundColor = Color.Transparent
+                                state = loadState,
                             )
 
                             Spacer(modifier = Modifier.height(20.dp))
 
-                            WeatherForecast(state = it)
+                            WeatherForecast(state = loadState)
 
                         }
 
-                        if(it.isLoading) {
+                        if(loadState.isLoading) {
                             CircularProgressIndicator(
                                 modifier = Modifier.align(Alignment.Center)
                             )
                         }
 
-                        it.error?.let { error ->
+                        loadState.error?.let { error ->
                             Text(
                                 text = error,
                                 color = Color.Red,
@@ -81,6 +96,13 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    private fun initiatesPermissionRequest(){
+        permissionLauncher.launch(arrayOf(
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ))
     }
 }
 

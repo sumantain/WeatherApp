@@ -1,4 +1,4 @@
-package com.sbw.weather.data.location
+package com.sbw.weather.core.location
 
 import android.Manifest
 import android.app.Application

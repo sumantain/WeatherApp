@@ -8,11 +8,25 @@ import com.sbw.weather.domain.weather.WeatherType
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
+/**
+ * A data class representing weather data with an associated index.
+ *
+ * @property index The index of the weather data point.
+ * @property data The actual weather data.
+ */
 private data class IndexWeatherData(
     val index: Int,
     val data: WeatherData
 )
 
+private const val DAY_IN_HOURS = 24
+
+/**
+ * Maps a [WeatherDataDto] object to a map of weather data organized by day.
+ *
+ * @receiver The [WeatherDataDto] object to map.
+ * @return A map where the key represents the day (0 for today, 1 for tomorrow, etc.) and the value is a list of [WeatherData] objects for that day.
+ */
 fun WeatherDataDto.toWeatherDataMap(): Map<Int, List<WeatherData>> {
 
     return time.mapIndexed { index, time ->
@@ -32,15 +46,17 @@ fun WeatherDataDto.toWeatherDataMap(): Map<Int, List<WeatherData>> {
             weatherType = WeatherType.fromWeatherModeObsever(weatherCode)
             )
         )
-    }.groupBy {
-        it.index/24
-    }.mapValues {
-        it.value.map { it.data }
-    }.also {
-        println("${it.keys} : ${it.values}")
-    }
+    }.chunked(DAY_IN_HOURS) // Group data into 24-hour chunks (days)
+        .mapIndexed { dayIndex, dailyData -> dayIndex to dailyData.map { it.data } } // Map to day index and weather data
+        .toMap() // Convert to a map
 }
 
+/**
+ * Maps a [WeatherDto] object to a [WeatherInfo] object.
+ *
+ * @receiver The [WeatherDto] object to map.
+ * @return A [WeatherInfo] object representing the weather information.
+ */
 fun WeatherDto.toWeatherInfo(): WeatherInfo{
     val weatherDataMap = weatherData.toWeatherDataMap()
     val now = LocalDateTime.now()

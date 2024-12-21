@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Weather</string>
+    <string name="km_h">km/h</string>
+    <string name="percentage">%</string>
+    <string name="hpa">hpa</string>
+    <string name="today">Today %1$s</string>
+    <string name="c">%1$s°C</string>
+    <string name="txt_today">Today</string>
+    <string name="location_permission_is_permanently_denied_you_can_enable_it_in_the_app_settings">Location permission is permanently denied. You can enable it in the app settings.</string>
 </resources>
