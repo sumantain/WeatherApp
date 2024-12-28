@@ -26,8 +26,8 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private val viewModel: WeatherViewModel by viewModels<WeatherViewModel>()
-    private lateinit var permissionLauncher: ActivityResultLauncher<Array<String>>
+    val viewModel: WeatherViewModel by viewModels<WeatherViewModel>()
+    lateinit var permissionLauncher: ActivityResultLauncher<Array<String>>
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
